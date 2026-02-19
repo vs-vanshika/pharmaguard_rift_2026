@@ -1,0 +1,8 @@
+##fileformat=VCFv4.2
+##INFO=<ID=GENE,Number=1,Type=String,Description="Gene Symbol">
+##INFO=<ID=STAR,Number=1,Type=String,Description="Star Allele">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE
+7	140777155	rs1142345	A	G	.	PASS	GENE=TPMT;STAR=*3A	GT	1/1
+4	50392073	rs3918290	A	G	.	PASS	GENE=DPYD;STAR=*2A	GT	1/1
+10	193703629	rs3892097	A	G	.	PASS	GENE=CYP2D6;STAR=*4	GT	0/1
