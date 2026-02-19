@@ -3,17 +3,14 @@ def determine_phenotype(gene: str, diplotype: str):
     Determine metabolizer phenotype based on gene and diplotype.
     Simplified CPIC-aligned demo logic.
     """
-
-    if diplotype in ["*1/*1"]:
+    if gene == "CYP2D6":
+        if diplotype == "*4/*4": return "PM"
+        if "*4" in diplotype: return "IM"
         return "NM"
 
-    if diplotype in ["*1/*2", "*1/*3"]:
-        return "IM"
-
-    if diplotype in ["*2/*2", "*3/*3", "*4/*4"]:
-        return "PM"
-
-    if diplotype in ["*1/*17"]:
-        return "URM"
+    if gene == "CYP2C19":
+        if diplotype == "*2/*2": return "PM"
+        if "*2" in diplotype: return "IM"
+        return "NM"
 
     return "Unknown"
