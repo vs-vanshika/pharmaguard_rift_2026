@@ -1,20 +1,12 @@
 from pydantic import BaseModel
 from typing import List
-from datetime import datetime
 
 
-class Variant(BaseModel):
+class DetectedVariant(BaseModel):
     rsid: str
     chromosome: str
     position: int
     genotype: str
-
-
-class PharmacogenomicProfile(BaseModel):
-    primary_gene: str
-    diplotype: str
-    phenotype: str
-    detected_variants: List[Variant]
 
 
 class RiskAssessment(BaseModel):
@@ -23,11 +15,18 @@ class RiskAssessment(BaseModel):
     severity: str
 
 
+class PharmacogenomicProfile(BaseModel):
+    primary_gene: str
+    diplotype: str
+    phenotype: str
+    detected_variants: List[DetectedVariant]
+
+
 class ClinicalRecommendation(BaseModel):
     recommended_action: str
 
 
-class LLMExplanation(BaseModel):
+class LLMGeneratedExplanation(BaseModel):
     summary: str
 
 
@@ -38,9 +37,9 @@ class QualityMetrics(BaseModel):
 class PharmaGuardResponse(BaseModel):
     patient_id: str
     drug: str
-    timestamp: datetime
+    timestamp: str
     risk_assessment: RiskAssessment
     pharmacogenomic_profile: PharmacogenomicProfile
     clinical_recommendation: ClinicalRecommendation
-    llm_generated_explanation: LLMExplanation
+    llm_generated_explanation: LLMGeneratedExplanation
     quality_metrics: QualityMetrics

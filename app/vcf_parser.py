@@ -1,48 +1,42 @@
 def parse_vcf(file_text: str):
-    """
-    Custom lightweight VCF parser (no pysam).
-    Extracts:
-    - chromosome
-    - position
-    - rsid
-    - gene
-    - star allele
-    - genotype
-    """
-
     variants = []
 
-    lines = file_text.splitlines()
+    for line in file_text.splitlines():
 
-    for line in lines:
         if line.startswith("#"):
-            continue  # Skip headers
-
-        parts = line.strip().split("\t")
-
-        if len(parts) < 10:
             continue
 
-        chrom = parts[0]
-        pos = parts[1]
-        rsid = parts[2]
-        info = parts[7]
-        genotype = parts[9]
+        fields = line.strip().split("\t")
 
-        # Parse INFO field
-        info_dict = {}
-        for item in info.split(";"):
-            if "=" in item:
-                key, value = item.split("=")
-                info_dict[key] = value
+        if len(fields) < 10:
+            continue
 
-        variants.append({
-            "chromosome": chrom,
-            "position": int(pos),
-            "rsid": rsid,
-            "gene": info_dict.get("GENE", "Unknown"),
-            "star": info_dict.get("STAR", "*1"),
-            "genotype": genotype
-        })
+        chromosome = fields[0]
+        position = int(fields[1])
+        rsid = fields[2]
+        info_field = fields[7]
+        genotype = fields[9]
+
+        gene = None
+        star = None
+
+        # Parse INFO column
+        info_parts = info_field.split(";")
+
+        for item in info_parts:
+            if item.startswith("GENE="):
+                gene = item.split("=")[1]
+            if item.startswith("STAR="):
+                star = item.split("=")[1]
+
+        if gene:
+            variants.append({
+                "gene": gene,
+                "star": star if star else "Unknown",
+                "rsid": rsid,
+                "chromosome": chromosome,
+                "position": position,
+                "genotype": genotype
+            })
 
     return variants

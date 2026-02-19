@@ -1,13 +1,10 @@
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from datetime import datetime
-from app.schemas import *
+from app.schemas import PharmaGuardResponse
 from app.vcf_parser import parse_vcf
 
 app = FastAPI(title="PharmaGuard API")
 
-templates = Jinja2Templates(directory="templates")
 
 SUPPORTED_DRUGS = [
     "CODEINE",
@@ -19,11 +16,17 @@ SUPPORTED_DRUGS = [
 ]
 
 
-# ------------------------------
-# Risk Engine
-# ------------------------------
-def simple_risk_engine(drug: str, gene: str, star: str):
+DRUG_GENE_MAP = {
+    "CODEINE": "CYP2D6",
+    "WARFARIN": "CYP2C9",
+    "CLOPIDOGREL": "CYP2C19",
+    "SIMVASTATIN": "SLCO1B1",
+    "AZATHIOPRINE": "TPMT",
+    "FLUOROURACIL": "DPYD"
+}
 
+
+def simple_risk_engine(drug: str, gene: str, star: str):
     risk_label = "Safe"
     severity = "none"
 
@@ -54,29 +57,14 @@ def simple_risk_engine(drug: str, gene: str, star: str):
     return risk_label, severity
 
 
-# ------------------------------
-# Web Home Page
-# ------------------------------
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
-
-# ------------------------------
-# API Endpoint (Swagger)
-# ------------------------------
 @app.post("/analyze", response_model=PharmaGuardResponse)
 async def analyze(
     file: UploadFile = File(...),
     drug: str = Form(...)
 ):
-    drug = drug.upper()
 
     if not file.filename.endswith(".vcf"):
         raise HTTPException(status_code=400, detail="Only VCF files allowed")
-
-    if drug not in SUPPORTED_DRUGS:
-        raise HTTPException(status_code=400, detail="Unsupported drug")
 
     contents = await file.read()
 
@@ -90,62 +78,61 @@ async def analyze(
     if not variants:
         raise HTTPException(status_code=400, detail="No variants found")
 
-    first_variant = variants[0]
+    drug = drug.upper()
 
-    risk_label, severity = simple_risk_engine(
-        drug,
-        first_variant["gene"],
-        first_variant["star"]
+    if drug not in SUPPORTED_DRUGS:
+        raise HTTPException(status_code=400, detail="Unsupported drug")
+
+    required_gene = DRUG_GENE_MAP.get(drug)
+
+    matching_variant = next(
+        (v for v in variants if v["gene"] == required_gene),
+        None
     )
 
-    return PharmaGuardResponse(
-        patient_id="PATIENT_001",
-        drug=drug,
-        timestamp=datetime.utcnow(),
-        risk_assessment={
+    if matching_variant:
+        risk_label, severity = simple_risk_engine(
+            drug,
+            matching_variant["gene"],
+            matching_variant["star"]
+        )
+
+        detected_variants = [{
+            "rsid": matching_variant["rsid"],
+            "chromosome": matching_variant["chromosome"],
+            "position": matching_variant["position"],
+            "genotype": matching_variant["genotype"]
+        }]
+
+        diplotype = matching_variant["star"]
+    else:
+        risk_label = "Unknown"
+        severity = "none"
+        detected_variants = []
+        diplotype = "Unknown"
+
+    return {
+        "patient_id": "PATIENT_001",
+        "drug": drug,
+        "timestamp": datetime.utcnow().isoformat(),
+        "risk_assessment": {
             "risk_label": risk_label,
-            "confidence_score": 0.85,
+            "confidence_score": 0.90,
             "severity": severity
         },
-        pharmacogenomic_profile={
-            "primary_gene": first_variant["gene"],
-            "diplotype": first_variant["star"],
+        "pharmacogenomic_profile": {
+            "primary_gene": required_gene,
+            "diplotype": diplotype,
             "phenotype": "Unknown",
-            "detected_variants": [{
-                "rsid": first_variant["rsid"],
-                "chromosome": first_variant["chromosome"],
-                "position": first_variant["position"],
-                "genotype": first_variant["genotype"]
-            }]
+            "detected_variants": detected_variants
         },
-        clinical_recommendation={
+        "clinical_recommendation": {
             "recommended_action": "Refer to CPIC guideline"
         },
-        llm_generated_explanation={
-            "summary": f"Variant in {first_variant['gene']} with allele {first_variant['star']} impacts {drug} metabolism."
+        "llm_generated_explanation": {
+            "summary": f"Variant in {required_gene} influences {drug} metabolism and may require clinical consideration."
         },
-        quality_metrics={
+        "quality_metrics": {
             "vcf_parsing_success": True
         }
-    )
-
-
-# ------------------------------
-# Web UI Endpoint
-# ------------------------------
-@app.post("/analyze_web", response_class=HTMLResponse)
-async def analyze_web(
-    request: Request,
-    file: UploadFile = File(...),
-    drug: str = Form(...)
-):
-    # Call existing API function
-    result = await analyze(file, drug)
-
-    return templates.TemplateResponse(
-        "result.html",
-        {
-            "request": request,
-            "result": result
-        }
-    )
+    }
