@@ -1,0 +1,91 @@
+{
+  "CODEINE": {
+    "CYP2D6": {
+      "Poor Metabolizer": {
+        "risk_label": "Ineffective",
+        "severity": "high",
+        "recommendation": "Avoid codeine. Consider alternative analgesic."
+      },
+      "Normal Metabolizer": {
+        "risk_label": "Safe",
+        "severity": "none",
+        "recommendation": "Standard dosing."
+      }
+    }
+  },
+
+  "WARFARIN": {
+    "CYP2C9": {
+      "Poor Metabolizer": {
+        "risk_label": "Toxic",
+        "severity": "critical",
+        "recommendation": "Reduce dose significantly. Monitor INR closely."
+      },
+      "Normal Metabolizer": {
+        "risk_label": "Safe",
+        "severity": "none",
+        "recommendation": "Standard dosing."
+      }
+    }
+  },
+
+  "CLOPIDOGREL": {
+    "CYP2C19": {
+      "Poor Metabolizer": {
+        "risk_label": "Ineffective",
+        "severity": "high",
+        "recommendation": "Use alternative antiplatelet therapy."
+      },
+      "Normal Metabolizer": {
+        "risk_label": "Safe",
+        "severity": "none",
+        "recommendation": "Standard dosing."
+      }
+    }
+  },
+
+  "SIMVASTATIN": {
+    "SLCO1B1": {
+      "Decreased Function": {
+        "risk_label": "Toxic",
+        "severity": "high",
+        "recommendation": "Use lower dose or alternative statin."
+      },
+      "Normal Function": {
+        "risk_label": "Safe",
+        "severity": "none",
+        "recommendation": "Standard dosing."
+      }
+    }
+  },
+
+  "AZATHIOPRINE": {
+    "TPMT": {
+      "Poor Metabolizer": {
+        "risk_label": "Toxic",
+        "severity": "critical",
+        "recommendation": "Avoid drug or use drastically reduced dose."
+      },
+      "Normal Metabolizer": {
+        "risk_label": "Safe",
+        "severity": "none",
+        "recommendation": "Standard dosing."
+      }
+    }
+  },
+
+  "FLUOROURACIL": {
+    "DPYD": {
+      "Poor Metabolizer": {
+        "risk_label": "Toxic",
+        "severity": "critical",
+        "recommendation": "Avoid drug or reduce dose significantly."
+      },
+      "Normal Metabolizer": {
+        "risk_label": "Safe",
+        "severity": "none",
+        "recommendation": "Standard dosing."
+      }
+    }
+  }
+}

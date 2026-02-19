@@ -1,0 +1,26 @@
+{
+  "CYP2D6": {
+    "*1": "Normal Metabolizer",
+    "*4": "Poor Metabolizer"
+  },
+  "CYP2C19": {
+    "*1": "Normal Metabolizer",
+    "*2": "Poor Metabolizer"
+  },
+  "CYP2C9": {
+    "*1": "Normal Metabolizer",
+    "*3": "Poor Metabolizer"
+  },
+  "SLCO1B1": {
+    "*1": "Normal Function",
+    "*5": "Decreased Function"
+  },
+  "TPMT": {
+    "*1": "Normal Metabolizer",
+    "*3A": "Poor Metabolizer"
+  },
+  "DPYD": {
+    "*1": "Normal Metabolizer",
+    "*2A": "Poor Metabolizer"
+  }
+}
