@@ -20,7 +20,6 @@ def parse_vcf(file_text: str):
         gene = None
         star = None
 
-        # Parse INFO column
         info_parts = info_field.split(";")
 
         for item in info_parts:

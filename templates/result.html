@@ -1,78 +1,118 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PharmaGuard Results</title>
+    <title>PharmaGuard | Results</title>
+
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #f5f5f5;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #eef4f9;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #0b3c5d;
         }
 
         .card {
             background: white;
+            width: 700px;
+            margin: 25px auto;
             padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
         }
 
-        .safe { color: green; font-weight: bold; }
-        .toxic { color: red; font-weight: bold; }
-        .ineffective { color: orange; font-weight: bold; }
-        .none { color: gray; font-weight: bold; }
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+            display: inline-block;
+        }
 
-        h1 { margin-bottom: 30px; }
-        a { text-decoration: none; color: blue; }
+        .safe { background: #2ecc71; }
+        .toxic { background: #e74c3c; }
+        .unknown { background: gray; }
+        .ineffective { background: #e67e22; }
+
+        .section {
+            margin-top: 15px;
+        }
+
+        .json-box {
+            background: #1e1e1e;
+            color: #00ff9f;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            text-decoration: none;
+            color: #0b3c5d;
+            font-weight: bold;
+        }
     </style>
 </head>
+
 <body>
 
-<h1>PharmaGuard Risk Assessment Results</h1>
-
-<div class="card">
-    <strong>Patient ID:</strong> {{ patient_id }}
-</div>
+<h1>Pharmacogenomic Risk Analysis</h1>
 
 {% for result in results %}
+
 <div class="card">
 
-    <h2>Drug: {{ result.drug }}</h2>
+    <h2>{{ result.drug }}</h2>
 
-    <p><strong>Primary Gene:</strong> {{ result.gene }}</p>
-
-    {% if result.star %}
-        <p><strong>Star Allele:</strong> {{ result.star }}</p>
-    {% endif %}
-
-    {% if result.genotype %}
-        <p><strong>Genotype:</strong> {{ result.genotype }}</p>
-    {% endif %}
-
-    <p>
+    <div class="section">
         <strong>Risk Level:</strong>
-        {% if result.risk_label == "Safe" %}
-            <span class="safe">{{ result.risk_label }}</span>
-        {% elif result.risk_label == "Toxic" %}
-            <span class="toxic">{{ result.risk_label }}</span>
-        {% elif result.risk_label == "Ineffective" %}
-            <span class="ineffective">{{ result.risk_label }}</span>
-        {% else %}
-            <span class="none">{{ result.risk_label }}</span>
-        {% endif %}
-    </p>
 
-    <p><strong>Severity:</strong> {{ result.severity }}</p>
+        <span class="badge 
+            {% if result.risk_assessment.risk_label == 'Safe' %}safe
+            {% elif result.risk_assessment.risk_label == 'Toxic' %}toxic
+            {% elif result.risk_assessment.risk_label == 'Ineffective' %}ineffective
+            {% else %}unknown
+            {% endif %}
+        ">
+            {{ result.risk_assessment.risk_label }}
+        </span>
+    </div>
 
-    {% if result.rsid %}
-        <p><strong>Variant:</strong> {{ result.rsid }} (Chr {{ result.chromosome }} : {{ result.position }})</p>
-    {% endif %}
+    <div class="section">
+        <strong>Severity:</strong> {{ result.risk_assessment.severity }} <br>
+        <strong>Confidence Score:</strong> {{ result.risk_assessment.confidence_score }}
+    </div>
+
+    <div class="section">
+        <strong>Primary Gene:</strong> {{ result.pharmacogenomic_profile.primary_gene }} <br>
+        <strong>Diplotype:</strong> {{ result.pharmacogenomic_profile.diplotype }} <br>
+        <strong>Phenotype:</strong> {{ result.pharmacogenomic_profile.phenotype }}
+    </div>
+
+    <div class="section">
+        <strong>Clinical Recommendation:</strong><br>
+        {{ result.clinical_recommendation.recommended_action }}
+    </div>
+
+    <div class="section">
+        <strong>AI Explanation:</strong><br>
+        {{ result.llm_generated_explanation.summary }}
+    </div>
 
 </div>
+
 {% endfor %}
 
-<br>
-<a href="/">Analyze Another Patient</a>
+<a href="/">← Analyze Another Patient</a>
 
 </body>
 </html>
