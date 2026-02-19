@@ -7,7 +7,6 @@ DRUG_GENE_MAP = {
     "FLUOROURACIL": "DPYD"
 }
 
-
 def assess_risk(drug: str, phenotype: str):
     if phenotype == "PM":
         return "Toxic", 0.9, "high"

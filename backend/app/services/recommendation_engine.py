@@ -3,7 +3,7 @@ def generate_recommendation(drug, phenotype):
         return (
             "High risk of toxicity detected.",
             "CPIC Level A Guideline",
-            "Avoid drug or significantly reduce dosage."
+            "Avoid drug or reduce dosage significantly."
         )
     elif phenotype == "IM":
         return (

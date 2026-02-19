@@ -4,6 +4,7 @@ from app.routes.analyze import router as analyze_router
 
 app = FastAPI(title="PharmaGuard API")
 
+# Allow CORS for all origins (adjust if needed)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -12,4 +13,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include routes
 app.include_router(analyze_router)

@@ -1,8 +1,8 @@
 import os
 import random
 
-OUTPUT_DIR = "sample_vcf"
-NUM_PATIENTS = 50  # 50 is enough for hackathon
+OUTPUT_DIR = "sample_vcf1"
+NUM_PATIENTS = 100  # 50 is enough for hackathon
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -57,4 +57,4 @@ for i in range(1, NUM_PATIENTS + 1):
         for gene in selected_genes:
             f.write(generate_variant(gene) + "\n")
 
-print(f"✅ Generated {NUM_PATIENTS} synthetic VCF files in '{OUTPUT_DIR}'")
+print(f" Generated {NUM_PATIENTS} synthetic VCF files in '{OUTPUT_DIR}'")
