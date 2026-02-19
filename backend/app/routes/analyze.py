@@ -18,6 +18,9 @@ class DrugEnum(str, Enum):
     AZATHIOPRINE = "AZATHIOPRINE"
     FLUOROURACIL = "FLUOROURACIL"
 
+
+
+
 router = APIRouter()
 
 @router.post("/analyze", response_model=List[AnalysisResponse])
@@ -36,6 +39,8 @@ async def analyze_vcf(
         gene = DRUG_GENE_MAP.get(d.value, "Unknown")
         variant_for_gene = next((v for v in variants if v["gene"] == gene), None)
         star = variant_for_gene["star"] if variant_for_gene else "*1/*1"
+
+
 
         phenotype = determine_phenotype(gene, star)
         risk_label, confidence, severity = assess_risk(d.value, phenotype)
