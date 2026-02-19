@@ -2,12 +2,10 @@ def parse_vcf(file_text: str):
     variants = []
 
     for line in file_text.splitlines():
-
         if line.startswith("#"):
             continue
 
         fields = line.strip().split("\t")
-
         if len(fields) < 10:
             continue
 
@@ -20,9 +18,7 @@ def parse_vcf(file_text: str):
         gene = None
         star = None
 
-        info_parts = info_field.split(";")
-
-        for item in info_parts:
+        for item in info_field.split(";"):
             if item.startswith("GENE="):
                 gene = item.split("=")[1]
             if item.startswith("STAR="):

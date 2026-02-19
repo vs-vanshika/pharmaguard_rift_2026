@@ -1,4 +1,6 @@
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 from typing import List
@@ -10,12 +12,17 @@ from app.rule_engine import evaluate_risk
 from app.llm_engine import generate_llm_explanation
 
 
-app = FastAPI(title="PharmaGuard API")
-
-
-# --------------------------------------------------
-# CORS (Required for Swagger)
-# --------------------------------------------------
+app = FastAPI(
+    title="PharmaGuard – AI Pharmacogenomics Platform",
+    description="AI-powered precision medicine risk engine.",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    swagger_ui_parameters={
+        "defaultModelsExpandDepth": -1,
+        "docExpansion": "none"
+    }
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,6 +32,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+templates = Jinja2Templates(directory="templates")
 
 SUPPORTED_DRUGS = [
     "CODEINE",
@@ -36,9 +44,10 @@ SUPPORTED_DRUGS = [
 ]
 
 
-# --------------------------------------------------
-# CORE API ENDPOINT
-# --------------------------------------------------
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
 
 @app.post("/analyze", response_model=List[PharmaGuardResponse])
 async def analyze(
@@ -58,16 +67,11 @@ async def analyze(
     variants = parse_vcf(file_text)
 
     if not variants:
-        raise HTTPException(
-            status_code=400,
-            detail="No pharmacogenomic variants found"
-        )
+        raise HTTPException(status_code=400, detail="No pharmacogenomic variants found")
 
     patient_id = os.path.splitext(file.filename)[0].upper()
 
-    # Support comma-separated + multi-string Swagger input
     processed_drugs = []
-
     for d in drug:
         if "," in d:
             processed_drugs.extend([x.strip().upper() for x in d.split(",")])
@@ -81,10 +85,7 @@ async def analyze(
     for single_drug in processed_drugs:
 
         if single_drug not in SUPPORTED_DRUGS:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Unsupported drug: {single_drug}"
-            )
+            raise HTTPException(status_code=400, detail=f"Unsupported drug: {single_drug}")
 
         risk_data = evaluate_risk(single_drug, variants)
 
