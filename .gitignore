@@ -139,7 +139,7 @@ backend/.env
 .env
 
 # Environments
-.env
+.env 
 .envrc
 .venv
 env/
