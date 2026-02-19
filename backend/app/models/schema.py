@@ -10,7 +10,6 @@ class Variant(BaseModel):
     ref: str
     alt: str
 
-
 class RiskAssessment(BaseModel):
     risk_label: str
     confidence_score: float
