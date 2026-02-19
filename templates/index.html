@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PharmaGuard</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        .container { max-width: 600px; margin: auto; }
+        .btn { padding: 10px 20px; background: blue; color: white; border: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>PharmaGuard Pharmacogenomic Risk Analyzer</h2>
+
+    <form action="/analyze_web" method="post" enctype="multipart/form-data">
+        <label>Upload VCF File:</label><br><br>
+        <input type="file" name="file" accept=".vcf" required><br><br>
+
+        <label>Select Drug:</label><br><br>
+        <select name="drug" required>
+            <option value="CODEINE">CODEINE</option>
+            <option value="WARFARIN">WARFARIN</option>
+            <option value="CLOPIDOGREL">CLOPIDOGREL</option>
+            <option value="SIMVASTATIN">SIMVASTATIN</option>
+            <option value="AZATHIOPRINE">AZATHIOPRINE</option>
+            <option value="FLUOROURACIL">FLUOROURACIL</option>
+        </select><br><br>
+
+        <button class="btn" type="submit">Analyze</button>
+    </form>
+</div>
+</body>
+</html>

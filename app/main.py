@@ -1,9 +1,13 @@
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 from datetime import datetime
 from app.schemas import *
 from app.vcf_parser import parse_vcf
 
 app = FastAPI(title="PharmaGuard API")
+
+templates = Jinja2Templates(directory="templates")
 
 SUPPORTED_DRUGS = [
     "CODEINE",
@@ -15,11 +19,10 @@ SUPPORTED_DRUGS = [
 ]
 
 
+# ------------------------------
+# Risk Engine
+# ------------------------------
 def simple_risk_engine(drug: str, gene: str, star: str):
-    """
-    Basic rule-based risk logic (Phase 1).
-    Can be expanded later.
-    """
 
     risk_label = "Safe"
     severity = "none"
@@ -51,11 +54,17 @@ def simple_risk_engine(drug: str, gene: str, star: str):
     return risk_label, severity
 
 
-@app.get("/")
-def root():
-    return {"message": "PharmaGuard API Running"}
+# ------------------------------
+# Web Home Page
+# ------------------------------
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
+# ------------------------------
+# API Endpoint (Swagger)
+# ------------------------------
 @app.post("/analyze", response_model=PharmaGuardResponse)
 async def analyze(
     file: UploadFile = File(...),
@@ -117,5 +126,26 @@ async def analyze(
         },
         quality_metrics={
             "vcf_parsing_success": True
+        }
+    )
+
+
+# ------------------------------
+# Web UI Endpoint
+# ------------------------------
+@app.post("/analyze_web", response_class=HTMLResponse)
+async def analyze_web(
+    request: Request,
+    file: UploadFile = File(...),
+    drug: str = Form(...)
+):
+    # Call existing API function
+    result = await analyze(file, drug)
+
+    return templates.TemplateResponse(
+        "result.html",
+        {
+            "request": request,
+            "result": result
         }
     )

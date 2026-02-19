@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PharmaGuard Result</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        .safe { color: green; font-weight: bold; }
+        .adjust { color: orange; font-weight: bold; }
+        .toxic { color: red; font-weight: bold; }
+        .box { border: 1px solid #ddd; padding: 20px; }
+    </style>
+</head>
+<body>
+
+<h2>Risk Assessment Result</h2>
+
+<div class="box">
+    <p><strong>Patient ID:</strong> {{ result.patient_id }}</p>
+    <p><strong>Drug:</strong> {{ result.drug }}</p>
+    <p><strong>Gene:</strong> {{ result.pharmacogenomic_profile.primary_gene }}</p>
+    <p><strong>Phenotype:</strong> {{ result.pharmacogenomic_profile.phenotype }}</p>
+
+    <p><strong>Risk Level:</strong>
+        {% if result.risk_assessment.risk_label == "Safe" %}
+            <span class="safe">Safe</span>
+        {% elif result.risk_assessment.risk_label == "Adjust Dosage" %}
+            <span class="adjust">Adjust Dosage</span>
+        {% else %}
+            <span class="toxic">{{ result.risk_assessment.risk_label }}</span>
+        {% endif %}
+    </p>
+
+    <p><strong>Recommendation:</strong>
+        {{ result.clinical_recommendation.recommended_action }}
+    </p>
+
+    <p><strong>Explanation:</strong>
+        {{ result.llm_generated_explanation.summary }}
+    </p>
+</div>
+
+<br>
+<a href="/">Analyze Another Patient</a>
+
+</body>
+</html>
